@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 
 const server = http.createServer((req, res) => {
-   
-    
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
     
     if (req.url === "/") {
         fs.readFile(path.join(__dirname, 'public', 'index.html'),
