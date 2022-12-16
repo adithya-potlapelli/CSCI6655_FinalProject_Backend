@@ -43,7 +43,7 @@ const server = http.createServer((req, res) => {
     {
         // Please note the content-type here is application/json
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.write('{"songs: [');
+        res.write('{"songs": [');
         const cursor = collection.find().cursor();
         let first = true;
         cursor.on('data', (doc) => {
