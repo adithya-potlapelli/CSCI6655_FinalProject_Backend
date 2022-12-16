@@ -1,6 +1,23 @@
 const http = require("http");
 const path = require("path");
 const fs = require("fs");
+const mongoose = require('mongoose');
+mongoose.set('strictQuery', true);
+
+const uri = "mongodb+srv://admin:password12345@cluster0.yb0p2h6.mongodb.net/?retryWrites=true&w=majority";
+mongoose.connect(uri, {useNewUrlParser: true});
+
+const songListCollection = new mongoose.Schema({
+    rank: Number,
+    title: String,
+    streams: Number,
+    artist: String,
+    year: String,
+    url: String
+});
+
+const collection = mongoose.model("songsList", songListCollection)
+const changeStreamCursor = collection.watch()
 
 const server = http.createServer((req, res) => {
 
@@ -24,16 +41,23 @@ const server = http.createServer((req, res) => {
      }
     else if (req.url==='/api')
     {
-        fs.readFile(
-            path.join(__dirname, 'public', 'db.json'),'utf-8',
-                    (err, content) => {
-                                    
-                                    if (err) throw err;
-                                    // Please note the content-type here is application/json
-                                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                                    res.end(content);
-                        }
-              );
+        // Please note the content-type here is application/json
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.write('{"songs: [');
+        const cursor = collection.find().cursor();
+        let first = true;
+        cursor.on('data', (doc) => {
+            if(first) {
+                first = false;
+            } else{
+                res.write(',');
+            }
+            res.write(JSON.stringify(doc));
+        });
+        cursor.on('end', ()=> {
+            res.write(']}');
+            res.end();
+        })
     }
     else{
         res.end("<h1> URL Not Found</h1>");
@@ -42,4 +66,7 @@ const server = http.createServer((req, res) => {
 
 const PORT= process.env.PORT || 5959;
 
-server.listen(PORT,()=> console.log(`Great our server is running on port ${PORT} `));
+server.listen(PORT,()=>
+{
+     console.log(`Great our server is running on port ${PORT} `)
+});

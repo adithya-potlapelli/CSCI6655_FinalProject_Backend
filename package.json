@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev" : "nodemon index",
-    "start": "node index.js"
+    "dev" : "nodemon index.js",
+    "start": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
   "engines": {
     "node": "18.x"
+  },
+  "dependencies": {
+    "mongoose" : "*"
   }
 }
